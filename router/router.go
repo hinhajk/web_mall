@@ -25,6 +25,9 @@ func NewRouter() *gin.Engine {
 		//轮播图
 		v1.GET("carousels", api.ListCarousel)
 
+		//商品操作
+		v1.GET("/product/lists", api.GetProductList) // 获取商品列表
+
 		//在验证token情况下进行的操作
 		authed := v1.Group("/")
 		authed.Use(middleware.JWT())
@@ -37,6 +40,7 @@ func NewRouter() *gin.Engine {
 			authed.POST("money", api.ShowMoney) //显示用户金额
 
 			authed.POST("/product/create", api.CreateProduct) //创建商品
+
 		}
 	}
 	return router

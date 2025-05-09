@@ -27,6 +27,7 @@ type ProductService struct {
 	models.BasePage
 }
 
+// Create 创建商品
 func (service *ProductService) Create(ctx context.Context, uid uint, files []*multipart.FileHeader) serializer.Response {
 	var boss *models.User
 	var err error
@@ -108,4 +109,41 @@ func (service *ProductService) Create(ctx context.Context, uid uint, files []*mu
 		Message: e.GetMsg(code),
 		Data:    serializer.BuildProduct(product),
 	}
+}
+
+// ProductList 获取商品列表
+func (service *ProductService) ProductList(ctx context.Context) serializer.Response {
+	var products []*models.Product
+	var err error
+	code := e.Success
+	if service.PageSize == 0 {
+		service.PageSize = 15
+	} //默认页数为15
+
+	//查询某类商品
+	condition := make(map[string]interface{})
+	if service.Category != 0 {
+		condition["category_id"] = service.Category
+	}
+	productDao := dao.NewProductDao(ctx)
+	total, err := productDao.CountProductByCategory(condition)
+	if err != nil {
+		code = e.Error
+		utils.LogObj.Infoln(err)
+		return serializer.Response{
+			Status:  code,
+			Message: e.GetMsg(code),
+			Error:   err.Error(),
+		}
+	}
+
+	wg := new(sync.WaitGroup)
+	wg.Add(1)
+	go func() {
+		productDao = dao.NewProductDaoByDB(productDao.DB)
+		products, _ = productDao.ListCountProductByCategory(condition, service.BasePage)
+		wg.Done()
+	}()
+	wg.Wait()
+	return serializer.BuildListResponse(serializer.BuildProducts(products), uint(total))
 }

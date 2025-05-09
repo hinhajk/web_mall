@@ -4,7 +4,6 @@ import (
 	"context"
 	"gopkg.in/mail.v2"
 	"mime/multipart"
-	"strings"
 	"time"
 	"web_mall/config"
 	"web_mall/dao"
@@ -241,13 +240,11 @@ func (service *SendEmailService) Send(ctx context.Context, uid uint) serializer.
 		}
 	}
 	address = config.ValidEmail + token //发送方
-	mailStr := notice.Text
-	mailTex := strings.Replace(mailStr, "Email", address, -1)
 	m := mail.NewMessage()
 	m.SetHeader("From", config.SmtpEmail)
 	m.SetHeader("To", service.Email)
 	m.SetHeader("Subject", "1111")
-	m.SetBody("text/html", mailTex)
+	m.SetBody("text/html", notice.Text+address)
 	d := mail.NewDialer(config.SmtpHost, 465, config.SmtpEmail, config.SmtpPass)
 	d.StartTLSPolicy = mail.MandatoryStartTLS
 	if err := d.DialAndSend(m); err != nil {

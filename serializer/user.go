@@ -25,6 +25,6 @@ func BuildUser(user *models.User) User {
 		Status:   user.Status,
 		Gender:   user.Gender,
 		Money:    user.Money,
-		Avatar:   user.Avatar + config.AvatarPath + config.Host + config.HttpPort,
+		Avatar:   config.Host + config.HttpPort + config.AvatarPath + user.Avatar,
 	}
 }

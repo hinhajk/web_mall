@@ -2,6 +2,7 @@ package serializer
 
 import (
 	"time"
+	"web_mall/config"
 	"web_mall/models"
 )
 
@@ -15,7 +16,7 @@ type ProductService struct {
 	Price         string    `json:"price"`
 	OnSale        bool      `json:"onSale"`
 	DisCountPrice string    `json:"discount_price"`
-	View          uint      `json:"view"`
+	View          uint64    `json:"view"`
 	CreateTime    time.Time `json:"create_time"`
 	Num           int       `json:"num"`
 	BossId        uint      `json:"boss_id"`
@@ -30,14 +31,22 @@ func BuildProduct(product *models.Product) *ProductService {
 		Category:      product.Category,
 		Title:         product.Title,
 		Info:          product.Info,
-		ImgPath:       product.ImgPath,
+		ImgPath:       config.Host + config.HttpPort + config.ProductPath + product.ImgPath,
 		Price:         product.Price,
 		OnSale:        product.OnSale,
 		DisCountPrice: product.DiscountPrice,
+		View:          product.View(),
 		CreateTime:    product.CreatedAt,
 		Num:           product.Num,
 		BossId:        product.BossId,
 		BossName:      product.BossName,
-		BossAvatar:    product.BossAvatar,
+		BossAvatar:    config.Host + config.HttpPort + config.ProductPath + product.BossAvatar,
 	}
+}
+
+func BuildProducts(products []*models.Product) (result []*ProductService) {
+	for _, product := range products {
+		result = append(result, BuildProduct(product))
+	}
+	return result
 }
