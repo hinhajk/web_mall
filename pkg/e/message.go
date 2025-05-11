@@ -13,6 +13,7 @@ var MsgFlags = map[int]string{
 	ErrorUploadFail:       "上传失败",
 	ErrorSendEmailFail:    "邮件发送失败",
 	ErrorProductImgUpload: "商品图片上传错误",
+	ErrorFavoritesExist:   "商品已收藏",
 }
 
 // GetMsg获取状态码对应的信息

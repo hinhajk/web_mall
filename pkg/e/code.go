@@ -18,4 +18,7 @@ const (
 
 	// product 模块错误
 	ErrorProductImgUpload = 4001
+
+	// 收藏夹错误
+	ErrorFavoritesExist = 5001
 )

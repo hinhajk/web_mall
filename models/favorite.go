@@ -2,7 +2,7 @@ package models
 
 import "gorm.io/gorm"
 
-// 收藏夹
+// Favorite 收藏夹
 type Favorite struct {
 	gorm.Model
 	User      User    `gorm:"ForeignKey:UserId"`

@@ -26,10 +26,13 @@ func NewRouter() *gin.Engine {
 		v1.GET("carousels", api.ListCarousel)
 
 		//商品操作
-		v1.GET("/product/lists", api.GetProductList) // 获取商品列表
+		v1.GET("product/lists", api.GetProductList)   // 获取商品列表
+		v1.GET("product/show/:id", api.ShowProduct)   //获取商品详细信息
+		v1.GET("product/imgs/:id", api.ShowImgs)      //获取商品图片信息
+		v1.GET("product/categories", api.GetCategory) //获取商品分类
 
 		//在验证token情况下进行的操作
-		authed := v1.Group("/")
+		authed := v1.Group("/") //需要登录保护
 		authed.Use(middleware.JWT())
 		{
 			authed.PUT("user/update", api.UserUpdate)
@@ -39,7 +42,17 @@ func NewRouter() *gin.Engine {
 
 			authed.POST("money", api.ShowMoney) //显示用户金额
 
-			authed.POST("/product/create", api.CreateProduct) //创建商品
+			//商品操作
+			authed.POST("product/create", api.CreateProduct)          //创建商品
+			authed.POST("product/search", api.SearchProduct)          //搜索商品
+			authed.DELETE("product/delete/:id", api.DeleteProduct)    //删除商品
+			authed.PUT("product/update/:id", api.UpdateProduct)       //更新商品信息（除图片外)
+			authed.PUT("product/update-avatar/:id", api.UpdateAvatar) //更新商品图片信息
+
+			//收藏夹操作
+			authed.GET("favorites", api.ShowFavorites)          //查看收藏夹
+			authed.POST("favorites", api.CreateFavorites)       //创建收藏夹
+			authed.DELETE("favorites/:id", api.DeleteFavorites) //删除收藏夹
 
 		}
 	}
