@@ -21,7 +21,7 @@ type ProductService struct {
 	Info          string `json:"info" form:"info"`
 	ImgPath       string `json:"img_path" form:"img_path"`
 	Price         string `json:"price" form:"price"`
-	OnSale        bool   `json:"onSale" form:"onSale"`
+	OnSale        bool   `json:"onSale" form:"onSale" default:"false"`
 	DisCountPrice string `json:"discount_price" form:"discount_price"`
 	Num           int    `json:"num" form:"num"`
 	models.BasePage
@@ -54,7 +54,7 @@ func (service *ProductService) Create(ctx context.Context, uid uint, files []*mu
 		Info:          service.Info,
 		ImgPath:       path,
 		Price:         service.Price,
-		OnSale:        true,
+		OnSale:        false,
 		DiscountPrice: service.DisCountPrice,
 		Num:           service.Num,
 		BossId:        boss.ID,
@@ -146,4 +146,157 @@ func (service *ProductService) ProductList(ctx context.Context) serializer.Respo
 	}()
 	wg.Wait()
 	return serializer.BuildListResponse(serializer.BuildProducts(products), uint(total))
+}
+
+// Search 搜索商品
+func (service *ProductService) Search(ctx context.Context, uid uint) serializer.Response {
+	code := e.Success
+	if service.PageSize == 0 {
+		service.PageSize = 15
+	}
+	productDao := dao.NewProductDao(ctx)
+	products, count, err := productDao.SearchProduct(service.Info, service.BasePage)
+	if err != nil {
+		code = e.Error
+		utils.LogObj.Infoln(err)
+		return serializer.Response{
+			Status:  code,
+			Message: e.GetMsg(code),
+			Error:   err.Error(),
+		}
+	}
+	return serializer.BuildListResponse(serializer.BuildProducts(products), uint(count))
+}
+
+// Show 显示商品详细信息和图片信息
+func (service *ProductService) Show(ctx context.Context, id string) serializer.Response {
+	code := e.Success
+	productDao := dao.NewProductDao(ctx)
+	pid, _ := strconv.Atoi(id)
+	product, err := productDao.ShowProductByID(uint(pid))
+	if err != nil {
+		code = e.Error
+		utils.LogObj.Infoln(err)
+		return serializer.Response{
+			Status:  code,
+			Message: e.GetMsg(code),
+			Error:   err.Error(),
+		}
+	}
+	return serializer.Response{
+		Status:  code,
+		Data:    serializer.BuildProduct(product),
+		Message: e.GetMsg(code),
+	}
+}
+
+// Delete 删除商品
+func (service *ProductService) Delete(ctx context.Context, uid uint, id string) serializer.Response {
+	productDao := dao.NewProductDao(ctx)
+	pid, _ := strconv.Atoi(id)
+	code := e.Success
+	err := productDao.DeleteProduct(uid, uint(pid))
+	if err != nil {
+		code = e.Error
+		utils.LogObj.Infoln(err)
+		return serializer.Response{
+			Status:  code,
+			Message: e.GetMsg(code),
+			Error:   err.Error(),
+		}
+	}
+	return serializer.Response{
+		Status:  code,
+		Message: e.GetMsg(code),
+	}
+}
+
+// Update 更新商品信息
+func (service *ProductService) Update(ctx context.Context, uid uint, id string) serializer.Response {
+	code := e.Success
+	productDao := dao.NewProductDao(ctx)
+	pid, _ := strconv.Atoi(id)
+	product, err := productDao.ShowProductByID(uint(pid))
+	product.OnSale = service.OnSale
+	if service.DisCountPrice != "" {
+		product.DiscountPrice = service.DisCountPrice
+	}
+	if service.Info != "" {
+		product.Info = service.Info
+	}
+	if service.Category != 0 {
+		product.Category = service.Category
+	}
+	if service.Title != "" {
+		product.Title = service.Title
+	}
+	if service.ProductName != "" {
+		product.ProductName = service.ProductName
+	}
+	if service.Num != 0 {
+		product.Num = service.Num
+	}
+	if service.Price != "" {
+		product.Price = service.Price
+	}
+	err = productDao.UpdateById(uid, uint(pid), product)
+	if err != nil {
+		code = e.Error
+		utils.LogObj.Infoln(err)
+		return serializer.Response{
+			Status:  code,
+			Message: e.GetMsg(code),
+			Error:   err.Error(),
+		}
+	}
+	return serializer.Response{
+		Status:  code,
+		Message: e.GetMsg(code),
+		Data:    serializer.BuildProduct(product),
+	}
+}
+
+// UpdateAvatar 更新商品图片信息
+func (service *ProductService) UpdateAvatar(ctx context.Context, uid uint, id string, files []*multipart.FileHeader) serializer.Response {
+	code := e.Success
+	productDao := dao.NewProductDao(ctx)
+	pid, _ := strconv.Atoi(id)
+	product, err := productDao.ShowProductByID(uint(pid))
+	if err != nil {
+		code = e.Error
+		utils.LogObj.Infoln(err)
+		return serializer.Response{
+			Status:  code,
+			Message: e.GetMsg(code),
+			Error:   err.Error(),
+		}
+	}
+	tmp, _ := files[0].Open()
+	if tmp != nil {
+		path, err1 := UploadProductToLocalStatic(tmp, uid, product.ProductName)
+		if err1 != nil {
+			utils.LogObj.Infoln(err1)
+			return serializer.Response{
+				Status:  code,
+				Message: e.GetMsg(code),
+				Error:   err1.Error(),
+			}
+		}
+		product.ImgPath = path
+	}
+	err = productDao.UpdateById(uid, uint(pid), product)
+	if err != nil {
+		code = e.Error
+		utils.LogObj.Infoln(err)
+		return serializer.Response{
+			Status:  code,
+			Message: e.GetMsg(code),
+			Error:   err.Error(),
+		}
+	}
+	return serializer.Response{
+		Status:  code,
+		Message: e.GetMsg(code),
+		Data:    serializer.BuildProduct(product),
+	}
 }
