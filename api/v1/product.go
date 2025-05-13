@@ -15,7 +15,7 @@ func CreateProduct(c *gin.Context) {
 	claims, _ := utils.ParseToken(c.GetHeader("Authorization"))
 	if err := c.ShouldBind(&createProduct); err == nil {
 		res := createProduct.Create(c.Request.Context(), claims.ID, files)
-		c.JSON(http.StatusBadRequest, res)
+		c.JSON(http.StatusOK, res)
 	} else {
 		c.JSON(http.StatusBadRequest, ErrorResponse(err))
 		utils.LogObj.Infoln(err)
@@ -40,7 +40,7 @@ func SearchProduct(c *gin.Context) {
 	claims, _ := utils.ParseToken(c.GetHeader("Authorization"))
 	if err := c.ShouldBind(&searchProduct); err == nil {
 		res := searchProduct.Search(c.Request.Context(), claims.ID)
-		c.JSON(http.StatusBadRequest, res)
+		c.JSON(http.StatusOK, res)
 	} else {
 		c.JSON(http.StatusBadRequest, ErrorResponse(err))
 		utils.LogObj.Infoln(err)
@@ -65,7 +65,7 @@ func DeleteProduct(c *gin.Context) {
 	claims, _ := utils.ParseToken(c.GetHeader("Authorization"))
 	if err := c.ShouldBind(&deleteProduct); err == nil {
 		res := deleteProduct.Delete(c.Request.Context(), claims.ID, c.Param("id"))
-		c.JSON(http.StatusBadRequest, res)
+		c.JSON(http.StatusOK, res)
 	} else {
 		c.JSON(http.StatusBadRequest, ErrorResponse(err))
 		utils.LogObj.Infoln(err)
@@ -78,7 +78,7 @@ func UpdateProduct(c *gin.Context) {
 	claims, _ := utils.ParseToken(c.GetHeader("Authorization"))
 	if err := c.ShouldBind(&updateProduct); err == nil {
 		res := updateProduct.Update(c.Request.Context(), claims.ID, c.Param("id"))
-		c.JSON(http.StatusBadRequest, res)
+		c.JSON(http.StatusOK, res)
 	} else {
 		c.JSON(http.StatusBadRequest, ErrorResponse(err))
 		utils.LogObj.Infoln(err)
@@ -93,7 +93,7 @@ func UpdateAvatar(c *gin.Context) {
 	claims, _ := utils.ParseToken(c.GetHeader("Authorization"))
 	if err := c.ShouldBind(&createProduct); err == nil {
 		res := createProduct.UpdateAvatar(c.Request.Context(), claims.ID, c.Param("id"), files)
-		c.JSON(http.StatusBadRequest, res)
+		c.JSON(http.StatusOK, res)
 	} else {
 		c.JSON(http.StatusBadRequest, ErrorResponse(err))
 		utils.LogObj.Infoln(err)

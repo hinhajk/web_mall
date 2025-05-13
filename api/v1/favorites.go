@@ -13,7 +13,7 @@ func CreateFavorites(c *gin.Context) {
 	claims, _ := utils.ParseToken(c.GetHeader("Authorization"))
 	if err := c.ShouldBind(&createFavorites); err == nil {
 		res := createFavorites.Create(c.Request.Context(), claims.ID)
-		c.JSON(http.StatusBadRequest, res)
+		c.JSON(http.StatusOK, res)
 	} else {
 		c.JSON(http.StatusBadRequest, ErrorResponse(err))
 		utils.LogObj.Infoln(err)
@@ -26,7 +26,7 @@ func DeleteFavorites(c *gin.Context) {
 	claims, _ := utils.ParseToken(c.GetHeader("Authorization"))
 	if err := c.ShouldBind(&deleteFavorites); err == nil {
 		res := deleteFavorites.Delete(c.Request.Context(), claims.ID, c.Param("id"))
-		c.JSON(http.StatusBadRequest, res)
+		c.JSON(http.StatusOK, res)
 	} else {
 		c.JSON(http.StatusBadRequest, ErrorResponse(err))
 		utils.LogObj.Infoln(err)
@@ -39,7 +39,7 @@ func ShowFavorites(c *gin.Context) {
 	claims, _ := utils.ParseToken(c.GetHeader("Authorization"))
 	if err := c.ShouldBind(&showFavorites); err == nil {
 		res := showFavorites.Show(c.Request.Context(), claims.ID)
-		c.JSON(http.StatusBadRequest, res)
+		c.JSON(http.StatusOK, res)
 	} else {
 		c.JSON(http.StatusBadRequest, ErrorResponse(err))
 		utils.LogObj.Infoln(err)

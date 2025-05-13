@@ -54,6 +54,20 @@ func NewRouter() *gin.Engine {
 			authed.POST("favorites", api.CreateFavorites)       //创建收藏夹
 			authed.DELETE("favorites/:id", api.DeleteFavorites) //删除收藏夹
 
+			//地址操作
+			authed.POST("address/create", api.CreateAddress)       //创建地址
+			authed.GET("address/show/:id", api.GetAddress)         //查询单个地址
+			authed.GET("address/lists", api.ListAddress)           //查询地址列表
+			authed.PUT("address/update/:id", api.UpdateAddress)    //更新单个地址
+			authed.DELETE("address/delete/:id", api.DeleteAddress) //删除单个地址
+
+			//购物车操作
+			authed.POST("cart/create", api.CreateCart)       //加入购物车
+			authed.GET("cart/show/:id", api.ShowCart)        //查询购物车
+			authed.PUT("cart/update/:id", api.UpdateCart)    //更新购物车
+			authed.DELETE("cart/delete/:id", api.DeleteCart) //移出购物车
+			authed.DELETE("cart/delete", api.DeleteCarts)    //	清空购物车
+
 		}
 	}
 	return router
